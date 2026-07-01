@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CFO Card Analyst — Local</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">CFO</div>
+        <div>
+          <strong>CFO Card Analyst</strong>
+          <small>Local e privado</small>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav active" data-view="dashboard">Visão geral</button>
+        <button class="nav" data-view="statements">Faturas</button>
+        <button class="nav" data-view="upload">Adicionar fatura</button>
+        <button class="nav" data-view="tree">Árvore de gastos</button>
+        <button class="nav" data-view="trends">Tendências</button>
+        <button class="nav" data-view="installments">Parcelados</button>
+        <button class="nav" data-view="rules">Regras</button>
+        <button class="nav" data-view="backup">Backup</button>
+      </nav>
+
+      <div class="privacy">
+        <strong>Privacidade local</strong>
+        <p>Os dados estruturados ficam neste navegador. Os PDFs ficam no IndexedDB do navegador.</p>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <h1 id="title">Visão geral</h1>
+          <p id="subtitle">Histórico do cartão com leitura gerencial.</p>
+        </div>
+        <div class="mode">● Modo local</div>
+      </header>
+
+      <section id="view-dashboard" class="view active">
+        <div class="notice">
+          <strong>Modo seguro para publicação:</strong> os dados exibidos inicialmente são demonstrativos. Importe o arquivo privado de histórico depois de abrir o app no seu iPad.
+        </div>
+        <div id="kpis" class="kpis"></div>
+
+        <div class="grid two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Evolução mensal</h2>
+                <p>Fatura bruta versus ajustada.</p>
+              </div>
+            </div>
+            <div id="monthly-chart"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Diagnóstico CFO</h2>
+                <p>Leitura automática baseada no histórico.</p>
+              </div>
+            </div>
+            <div id="diagnosis"></div>
+          </article>
+        </div>
+
+        <div class="grid two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Composição do último mês</h2>
+                <p>Participação por categoria.</p>
+              </div>
+            </div>
+            <div id="category-bars"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Veículos — 3 meses</h2>
+                <p>Sem Parar, combustível, manutenção e estacionamento.</p>
+              </div>
+            </div>
+            <div id="vehicle-table"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-statements" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Faturas consolidadas</h2>
+            <p>Abra cada mês para conferir resumo, contexto e PDF.</p>
+          </div>
+          <button class="primary" data-go="upload">Adicionar fatura</button>
+        </div>
+        <div id="statements-list" class="statement-list"></div>
+      </section>
+
+      <section id="view-upload" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Adicionar nova fatura</h2>
+              <p>O PDF fica somente neste navegador.</p>
+            </div>
+          </div>
+
+          <label class="dropzone" for="pdf-input">
+            <input id="pdf-input" type="file" accept="application/pdf" />
+            <span class="pdf-icon">PDF</span>
+            <strong>Selecione a fatura em PDF</strong>
+            <small>O arquivo não será enviado para nenhum servidor.</small>
+          </label>
+
+          <div id="upload-status" class="upload-status"></div>
+
+          <form id="statement-form" class="hidden">
+            <div class="form-grid">
+              <label>Mês de referência
+                <input id="statement-month" type="month" required />
+              </label>
+              <label>Vencimento
+                <input id="due-date" type="date" />
+              </label>
+              <label>Total bruto
+                <input id="total-amount" type="number" step="0.01" min="0" required />
+              </label>
+              <label>Total ajustado
+                <input id="adjusted-total" type="number" step="0.01" min="0" required />
+              </label>
+              <label>Próxima fatura comprometida
+                <input id="next-commitment" type="number" step="0.01" min="0" />
+              </label>
+              <label>Total parcelado futuro
+                <input id="future-total" type="number" step="0.01" min="0" />
+              </label>
+            </div>
+
+            <label>Contexto do mês
+              <textarea id="month-context" rows="3" placeholder="Ex.: aniversário, férias, compra médica extraordinária..."></textarea>
+            </label>
+
+            <div class="toolbar">
+              <div>
+                <h3>Lançamentos identificados</h3>
+                <p>Revise categorias e exclusões da tendência.</p>
+              </div>
+              <button type="button" class="secondary" id="add-transaction">Adicionar linha</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Estabelecimento</th>
+                    <th>Valor</th>
+                    <th>Categoria</th>
+                    <th>Tipo</th>
+                    <th>Excluir tendência</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="review-transactions"></tbody>
+              </table>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="secondary" id="cancel-review">Cancelar</button>
+              <button type="submit" class="primary">Consolidar fatura</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="view-tree" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Árvore de gastos</h2>
+            <p>Abra cada categoria para ver subcategorias.</p>
+          </div>
+          <select id="tree-month-filter"></select>
+        </div>
+        <div id="cost-tree" class="cost-tree"></div>
+      </section>
+
+      <section id="view-trends" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Tendências</h2>
+            <p>Média, mediana, volatilidade e direção.</p>
+          </div>
+        </div>
+        <article id="trends-panel" class="panel"></article>
+      </section>
+
+      <section id="view-installments" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Parcelados</h2>
+            <p>Comprometimento futuro e visão de caixa.</p>
+          </div>
+        </div>
+        <div id="installments-panel"></div>
+      </section>
+
+      <section id="view-rules" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Regras de classificação</h2>
+            <p>Usadas na interpretação de novos lançamentos.</p>
+          </div>
+        </div>
+        <div id="rules-list" class="rules-list"></div>
+      </section>
+
+      <section id="view-backup" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Backup e restauração</h2>
+              <p>O backup JSON inclui histórico e regras. Os PDFs devem ser guardados à parte.</p>
+            </div>
+          </div>
+
+          <div class="backup-actions">
+            <button id="export-backup" class="primary">Exportar backup JSON</button>
+            <label class="secondary file-button">
+              Importar backup
+              <input id="import-backup" type="file" accept="application/json" />
+            </label>
+            <button id="clear-data" class="danger">Apagar dados locais</button>
+          </div>
+
+          <div class="notice warning">
+            <strong>Importante:</strong> use sempre o mesmo perfil do navegador. Limpar os dados do navegador pode apagar o histórico local.
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="statement-dialog">
+    <div class="dialog-head">
+      <div>
+        <h2 id="dialog-title">Fatura</h2>
+        <p id="dialog-subtitle"></p>
+      </div>
+      <button id="close-dialog" class="icon-btn">×</button>
+    </div>
+    <div id="dialog-content"></div>
+  </dialog>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
