@@ -5,7 +5,8 @@ const DB_VERSION=1;
 const CATEGORIES=[
   "Alimentação","Veículos e Transporte","Saúde","Assinaturas e Serviços",
   "Parcelados / Bens / Seguros","Família e Filhos","Lazer e Viagens",
-  "Compras / Educação / Diversos","Moradia e Casa","Outros / Não classificados"
+  "Compras Pessoais","Educação e Desenvolvimento","Pets","Financeiro",
+  "Moradia e Casa","Revisão necessária"
 ];
 
 const TREE={
@@ -16,9 +17,12 @@ const TREE={
   "Parcelados / Bens / Seguros":["Eletrônicos","Vestuário parcelado","Seguro","Automotivo parcelado","Outros parcelados"],
   "Família e Filhos":["Escola","Material escolar","Presentes","Festas","Lazer infantil","Atividades extracurriculares"],
   "Lazer e Viagens":["Restaurantes de lazer","Hotéis / passagens","Parques / eventos","Férias","Experiências familiares"],
-  "Compras / Educação / Diversos":["Mercado Livre","Vestuário","Educação","Hobby","Diversos"],
+  "Compras Pessoais":["Mercado Livre","Vestuário","Cuidados pessoais","Eletrônicos","Hobby","Outras compras"],
+  "Educação e Desenvolvimento":["Cursos","Livros","Aplicativos educacionais","Material de estudo","Idiomas"],
+  "Pets":["Alimentação pet","Veterinário","Medicamentos","Banho e tosa","Acessórios"],
+  "Financeiro":["Juros","IOF","Tarifas","Seguros financeiros","Anuidade"],
   "Moradia e Casa":["Supermercado doméstico","Utilidades","Manutenção","Construção e decoração","Serviços domésticos"],
-  "Outros / Não classificados":["Revisão necessária"]
+  "Revisão necessária":["Categoria pendente"]
 };
 
 const DEFAULT_RULES=[
@@ -41,7 +45,7 @@ const DEFAULT_RULES=[
   {pattern:"NETFLIX",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente"},
   {pattern:"GLOBOPLAY",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente"},
   {pattern:"CLARO",category:"Assinaturas e Serviços",subcategory:"Telefonia",type:"Recorrente"},
-  {pattern:"MERCADOLIVRE",category:"Compras / Educação / Diversos",subcategory:"Mercado Livre",type:"Variável"},
+  {pattern:"MERCADOLIVRE",category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável"},
   {pattern:"ANIMALIA",category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual"}
 ];
 
@@ -53,12 +57,53 @@ const SEED=[
     categories:{
       "Alimentação":350,"Saúde":100,"Veículos e Transporte":200,
       "Assinaturas e Serviços":100,"Parcelados / Bens / Seguros":100,
-      "Compras / Educação / Diversos":50
+      "Compras Pessoais":50
     },
     vehicleBreakdown:{"Pedágio / Sem Parar":120,"Combustível":50,"Manutenção":30,"Estacionamento":0},
     transactions:[],fileId:null,isEstimate:true
   }
 ];
+
+
+function migrateState(input){
+  const data=input||defaultState();
+  data.statements=(data.statements||[]).map(statement=>{
+    statement.categories=statement.categories||{};
+    let pending=Number(statement.categories["Revisão necessária"]||0);
+
+    if(statement.categories["Outros / Não classificados"]!==undefined){
+      pending+=Number(statement.categories["Outros / Não classificados"]||0);
+      delete statement.categories["Outros / Não classificados"];
+    }
+
+    if(statement.categories["Compras / Educação / Diversos"]!==undefined){
+      pending+=Number(statement.categories["Compras / Educação / Diversos"]||0);
+      delete statement.categories["Compras / Educação / Diversos"];
+      const note="Valor da antiga categoria agrupada Compras/Educação/Diversos transferido para Revisão necessária após atualização da árvore.";
+      if(!(statement.context||"").includes(note)) statement.context=(statement.context?statement.context+" ":"")+note;
+    }
+
+    if(pending>0) statement.categories["Revisão necessária"]=pending;
+
+    statement.transactions=(statement.transactions||[]).map(t=>{
+      if(t.category==="Outros / Não classificados" || t.category==="Compras / Educação / Diversos"){
+        t.category="Revisão necessária";
+        t.subcategory="Categoria pendente";
+      }
+      return t;
+    });
+    return statement;
+  });
+
+  data.rules=(data.rules||DEFAULT_RULES).map(rule=>{
+    if(rule.category==="Outros / Não classificados" || rule.category==="Compras / Educação / Diversos"){
+      return {...rule,category:"Revisão necessária",subcategory:"Categoria pendente"};
+    }
+    return rule;
+  });
+  data.version=3;
+  return data;
+}
 
 function defaultState(){
   return {
@@ -75,7 +120,7 @@ let currentReview=null;
 function loadState(){
   try{
     const raw=localStorage.getItem(APP_KEY);
-    return raw?JSON.parse(raw):defaultState();
+    return migrateState(raw?JSON.parse(raw):defaultState());
   }catch(e){return defaultState()}
 }
 function saveState(){localStorage.setItem(APP_KEY,JSON.stringify(state))}
@@ -125,6 +170,7 @@ function renderDashboard(){
     ["Mediana",money(median(adjusted)),"Reduz efeito de outliers",""],
     ["Desvio padrão",money(std(adjusted)),"Volatilidade do histórico",std(adjusted)>2000?"warn":""],
     ["Pontuais excluídos",money(last.pointInTime||0),"Mantidos no caixa bruto",""],
+    ["Revisão pendente",money(last.categories["Revisão necessária"]||0),"Valor ainda não classificado",(last.categories["Revisão necessária"]||0)>0?"warn":"good"],
     ["Próxima fatura",money(last.nextCommitment),"Compromisso já contratado","warn"],
     ["Parcelado futuro",money(last.futureTotal),"Saldo para meses seguintes",""],
     ["Grau de risco",risk,"Com base na fatura ajustada",riskClass],
@@ -260,7 +306,7 @@ function classify(merchant){
   if(rule)return {category:rule.category,subcategory:rule.subcategory,type:rule.type};
   if(/DELL|EDIFIER|YELUM|SEGURO/.test(n))return {category:"Parcelados / Bens / Seguros",subcategory:"Outros parcelados",type:"Parcelado"};
   if(/HOTEL|PARQUE|EVENTO|FEST/.test(n))return {category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual"};
-  return {category:"Outros / Não classificados",subcategory:"Revisão necessária",type:"Variável"};
+  return {category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável"};
 }
 function parseStatementText(text,fileName){
   const dueMatch=text.match(/Vencimento:\s*(\d{2}\/\d{2}\/\d{4})/i)||text.match(/Com vencimento em:\s*(\d{2}\/\d{2}\/\d{4})/i);
@@ -325,6 +371,12 @@ function fillReview(){
 }
 function catOptions(sel){return CATEGORIES.map(c=>`<option ${c===sel?"selected":""}>${c}</option>`).join("")}
 function renderReview(){
+  const pending=(currentReview.transactions||[]).filter(t=>t.category==="Revisão necessária");
+  const pendingValue=pending.reduce((sum,t)=>sum+Number(t.amount||0),0);
+  const alert=document.querySelector("#review-alert");
+  alert.innerHTML=pending.length
+    ? `<div class="notice warning"><strong>Revisão pendente:</strong> ${pending.length} lançamento(s), total de ${money(pendingValue)}. Reclassifique antes de consolidar ou confirme explicitamente a manutenção como pendente.</div>`
+    : `<div class="notice"><strong>Classificação revisada:</strong> não há lançamentos pendentes.</div>`;
   document.querySelector("#review-transactions").innerHTML=(currentReview.transactions||[]).map((t,i)=>`
     <tr>
       <td><input class="tx-date" value="${t.date||""}"></td>
@@ -346,11 +398,14 @@ function syncReview(){
   })
 }
 window.removeReviewTx=function(i){syncReview();currentReview.transactions.splice(i,1);renderReview()}
-document.querySelector("#add-transaction").onclick=()=>{syncReview();currentReview.transactions.push({id:crypto.randomUUID(),date:"",merchant:"Novo lançamento",amount:0,category:"Outros / Não classificados",subcategory:"Revisão necessária",type:"Variável",excluded:false});renderReview()}
+document.querySelector("#add-transaction").onclick=()=>{syncReview();currentReview.transactions.push({id:crypto.randomUUID(),date:"",merchant:"Novo lançamento",amount:0,category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável",excluded:false});renderReview()}
 document.querySelector("#cancel-review").onclick=()=>{currentReview=null;document.querySelector("#statement-form").classList.add("hidden");document.querySelector("#pdf-input").value="";document.querySelector("#upload-status").textContent=""}
 
 document.querySelector("#statement-form").onsubmit=e=>{
   e.preventDefault();syncReview();
+  const pending=currentReview.transactions.filter(t=>t.category==="Revisão necessária");
+  const pendingValue=pending.reduce((sum,t)=>sum+Number(t.amount||0),0);
+  if(pending.length && !confirm(`Existem ${pending.length} lançamento(s) em Revisão necessária, totalizando ${money(pendingValue)}. Deseja consolidar mesmo assim?`)) return;
   const month=document.querySelector("#statement-month").value;if(!month)return alert("Informe o mês.");
   const categories={};let pointInTime=0;
   currentReview.transactions.forEach(t=>{if(t.excluded)pointInTime+=Number(t.amount||0);else categories[t.category]=(categories[t.category]||0)+Number(t.amount||0)});
@@ -361,7 +416,7 @@ document.querySelector("#statement-form").onsubmit=e=>{
     nextCommitment:Number(document.querySelector("#next-commitment").value||0),
     futureTotal:Number(document.querySelector("#future-total").value||0),pointInTime,
     context:document.querySelector("#month-context").value,
-    categories:Object.keys(categories).length?categories:{"Outros / Não classificados":total-pointInTime},
+    categories:Object.keys(categories).length?categories:{"Revisão necessária":total-pointInTime},
     vehicleBreakdown:buildVehicle(currentReview.transactions),transactions:currentReview.transactions,
     fileId:currentReview.fileId,isEstimate:false
   };
@@ -405,7 +460,7 @@ document.querySelector("#export-backup").onclick=()=>{
 }
 document.querySelector("#import-backup").onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
-  try{const data=JSON.parse(await f.text());if(!data.statements||!data.rules)throw new Error("Backup inválido.");state=data;saveState();renderAll();alert("Backup restaurado.")}catch(err){alert(err.message)}
+  try{const data=JSON.parse(await f.text());if(!data.statements||!data.rules)throw new Error("Backup inválido.");state=migrateState(data);saveState();renderAll();alert("Backup restaurado e atualizado para a nova árvore de gastos.")}catch(err){alert(err.message)}
   e.target.value="";
 }
 document.querySelector("#clear-data").onclick=async()=>{
