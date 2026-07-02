@@ -77,3 +77,5 @@ dialog{border:0;border-radius:20px;width:min(900px,92vw);padding:0;box-shadow:0 
 
 .tree-node.pending{border-color:#e6bd6c}
 .pending-note{color:var(--yellow);font-weight:700}
+
+.tx-confidence{font-size:11px;color:var(--muted);margin-top:4px}

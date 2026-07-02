@@ -6,7 +6,7 @@ const CATEGORIES=[
   "Alimentação","Veículos e Transporte","Saúde","Assinaturas e Serviços",
   "Parcelados / Bens / Seguros","Família e Filhos","Lazer e Viagens",
   "Compras Pessoais","Educação e Desenvolvimento","Pets","Financeiro",
-  "Moradia e Casa","Revisão necessária"
+  "Moradia e Casa"
 ];
 
 const TREE={
@@ -17,36 +17,119 @@ const TREE={
   "Parcelados / Bens / Seguros":["Eletrônicos","Vestuário parcelado","Seguro","Automotivo parcelado","Outros parcelados"],
   "Família e Filhos":["Escola","Material escolar","Presentes","Festas","Lazer infantil","Atividades extracurriculares"],
   "Lazer e Viagens":["Restaurantes de lazer","Hotéis / passagens","Parques / eventos","Férias","Experiências familiares"],
-  "Compras Pessoais":["Mercado Livre","Vestuário","Cuidados pessoais","Eletrônicos","Hobby","Outras compras"],
+  "Compras Pessoais":["Marketplace","Vestuário","Cuidados pessoais","Eletrônicos","Hobby","Outras compras"],
   "Educação e Desenvolvimento":["Cursos","Livros","Aplicativos educacionais","Material de estudo","Idiomas"],
   "Pets":["Alimentação pet","Veterinário","Medicamentos","Banho e tosa","Acessórios"],
-  "Financeiro":["Juros","IOF","Tarifas","Seguros financeiros","Anuidade"],
-  "Moradia e Casa":["Supermercado doméstico","Utilidades","Manutenção","Construção e decoração","Serviços domésticos"],
-  "Revisão necessária":["Categoria pendente"]
+  "Financeiro":["Juros","IOF","Tarifas","Seguros","Anuidade"],
+  "Moradia e Casa":["Supermercado doméstico","Utilidades","Manutenção","Construção e decoração","Serviços domésticos"]
 };
 
 const DEFAULT_RULES=[
-  {pattern:"SEM PARAR",category:"Veículos e Transporte",subcategory:"Pedágio / Sem Parar",type:"Semi-obrigatório"},
-  {pattern:"AUTO POSTO",category:"Veículos e Transporte",subcategory:"Combustível",type:"Recorrente"},
-  {pattern:"MARLUB",category:"Veículos e Transporte",subcategory:"Manutenção",type:"Parcelado"},
-  {pattern:"ALLPARK",category:"Veículos e Transporte",subcategory:"Estacionamento",type:"Variável"},
-  {pattern:"IFD",category:"Alimentação",subcategory:"Delivery",type:"Variável"},
-  {pattern:"IFOOD",category:"Alimentação",subcategory:"Delivery",type:"Variável"},
-  {pattern:"PADARIA",category:"Alimentação",subcategory:"Padaria e café",type:"Variável"},
-  {pattern:"CAFE",category:"Alimentação",subcategory:"Padaria e café",type:"Variável"},
-  {pattern:"RESTAURANTE",category:"Alimentação",subcategory:"Restaurantes",type:"Variável"},
-  {pattern:"GRILL",category:"Alimentação",subcategory:"Restaurantes",type:"Variável"},
-  {pattern:"PIZZ",category:"Alimentação",subcategory:"Restaurantes",type:"Variável"},
-  {pattern:"ATACADAO",category:"Alimentação",subcategory:"Atacado",type:"Variável"},
-  {pattern:"RD SAUDE",category:"Saúde",subcategory:"Farmácia",type:"Variável"},
-  {pattern:"RAIA",category:"Saúde",subcategory:"Farmácia",type:"Variável"},
-  {pattern:"DROGARIA",category:"Saúde",subcategory:"Farmácia",type:"Variável"},
-  {pattern:"APPLE",category:"Assinaturas e Serviços",subcategory:"Produtividade",type:"Recorrente"},
-  {pattern:"NETFLIX",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente"},
-  {pattern:"GLOBOPLAY",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente"},
-  {pattern:"CLARO",category:"Assinaturas e Serviços",subcategory:"Telefonia",type:"Recorrente"},
-  {pattern:"MERCADOLIVRE",category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável"},
-  {pattern:"ANIMALIA",category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual"}
+  // Veículos e transporte
+  {pattern:"SEM PARAR",category:"Veículos e Transporte",subcategory:"Pedágio / Sem Parar",type:"Semi-obrigatório",confidence:0.99},
+  {pattern:"AUTO POSTO",category:"Veículos e Transporte",subcategory:"Combustível",type:"Recorrente",confidence:0.98},
+  {pattern:"POSTO",category:"Veículos e Transporte",subcategory:"Combustível",type:"Recorrente",confidence:0.86},
+  {pattern:"MARLUB",category:"Veículos e Transporte",subcategory:"Manutenção",type:"Parcelado",confidence:0.99},
+  {pattern:"ALLPARK",category:"Veículos e Transporte",subcategory:"Estacionamento",type:"Variável",confidence:0.99},
+  {pattern:"ESTACIONAMENTO",category:"Veículos e Transporte",subcategory:"Estacionamento",type:"Variável",confidence:0.95},
+  {pattern:"LAVA RAPIDO",category:"Veículos e Transporte",subcategory:"Lavagem",type:"Variável",confidence:0.97},
+  {pattern:"BOITUVA COMERCIO",category:"Veículos e Transporte",subcategory:"Combustível",type:"Variável",confidence:0.78},
+  {pattern:"UBER",category:"Veículos e Transporte",subcategory:"Aplicativos de transporte",type:"Variável",confidence:0.96},
+  {pattern:"99APP",category:"Veículos e Transporte",subcategory:"Aplicativos de transporte",type:"Variável",confidence:0.96},
+
+  // Alimentação
+  {pattern:"IFOOD",category:"Alimentação",subcategory:"Delivery",type:"Variável",confidence:0.99},
+  {pattern:"IFD",category:"Alimentação",subcategory:"Delivery",type:"Variável",confidence:0.96},
+  {pattern:"RAPPI",category:"Alimentação",subcategory:"Delivery",type:"Variável",confidence:0.98},
+  {pattern:"PADARIA",category:"Alimentação",subcategory:"Padaria e café",type:"Variável",confidence:0.97},
+  {pattern:"CAFE",category:"Alimentação",subcategory:"Padaria e café",type:"Variável",confidence:0.82},
+  {pattern:"RESTAURANTE",category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.97},
+  {pattern:"GRILL",category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.94},
+  {pattern:"PIZZ",category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.95},
+  {pattern:"HAMBUR",category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.94},
+  {pattern:"SUSHI",category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.95},
+  {pattern:"ATACADAO",category:"Alimentação",subcategory:"Atacado",type:"Variável",confidence:0.99},
+  {pattern:"ASSAI",category:"Alimentação",subcategory:"Atacado",type:"Variável",confidence:0.98},
+  {pattern:"CARREFOUR",category:"Alimentação",subcategory:"Supermercado",type:"Variável",confidence:0.96},
+  {pattern:"SUPERMERCADO",category:"Alimentação",subcategory:"Supermercado",type:"Variável",confidence:0.97},
+  {pattern:"MERCADO",category:"Alimentação",subcategory:"Supermercado",type:"Variável",confidence:0.72},
+  {pattern:"HORTIFRUTI",category:"Alimentação",subcategory:"Hortifruti e açougue",type:"Variável",confidence:0.97},
+  {pattern:"ACOUGUE",category:"Alimentação",subcategory:"Hortifruti e açougue",type:"Variável",confidence:0.97},
+
+  // Saúde
+  {pattern:"RD SAUDE",category:"Saúde",subcategory:"Farmácia",type:"Variável",confidence:0.99},
+  {pattern:"RAIA",category:"Saúde",subcategory:"Farmácia",type:"Variável",confidence:0.99},
+  {pattern:"DROGARIA",category:"Saúde",subcategory:"Farmácia",type:"Variável",confidence:0.98},
+  {pattern:"DROGA",category:"Saúde",subcategory:"Farmácia",type:"Variável",confidence:0.88},
+  {pattern:"FARMACIA",category:"Saúde",subcategory:"Farmácia",type:"Variável",confidence:0.98},
+  {pattern:"GRANDVISION",category:"Saúde",subcategory:"Ótica",type:"Parcelado",confidence:0.99},
+  {pattern:"OTICA",category:"Saúde",subcategory:"Ótica",type:"Variável",confidence:0.97},
+  {pattern:"SUPERSAUDAVEIS",category:"Saúde",subcategory:"Medicamentos recorrentes",type:"Parcelado",confidence:0.82},
+  {pattern:"LABORATORIO",category:"Saúde",subcategory:"Exames",type:"Variável",confidence:0.95},
+  {pattern:"CLINICA",category:"Saúde",subcategory:"Consultas",type:"Variável",confidence:0.87},
+
+  // Assinaturas e serviços
+  {pattern:"APPLE",category:"Assinaturas e Serviços",subcategory:"Produtividade",type:"Recorrente",confidence:0.94},
+  {pattern:"NETFLIX",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente",confidence:0.99},
+  {pattern:"GLOBOPLAY",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente",confidence:0.99},
+  {pattern:"SPOTIFY",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente",confidence:0.99},
+  {pattern:"YOUTUBE",category:"Assinaturas e Serviços",subcategory:"Streaming",type:"Recorrente",confidence:0.92},
+  {pattern:"CLARO",category:"Assinaturas e Serviços",subcategory:"Telefonia",type:"Recorrente",confidence:0.96},
+  {pattern:"CARTOLA",category:"Assinaturas e Serviços",subcategory:"Clubes e benefícios",type:"Recorrente",confidence:0.99},
+  {pattern:"MELI+",category:"Assinaturas e Serviços",subcategory:"Clubes e benefícios",type:"Recorrente",confidence:0.96},
+  {pattern:"MELI MAIS",category:"Assinaturas e Serviços",subcategory:"Clubes e benefícios",type:"Recorrente",confidence:0.96},
+  {pattern:"GOODNOTES",category:"Assinaturas e Serviços",subcategory:"Produtividade",type:"Recorrente",confidence:0.99},
+  {pattern:"OPENAI",category:"Assinaturas e Serviços",subcategory:"Produtividade",type:"Recorrente",confidence:0.99},
+  {pattern:"CHATGPT",category:"Assinaturas e Serviços",subcategory:"Produtividade",type:"Recorrente",confidence:0.99},
+  {pattern:"ICLOUD",category:"Assinaturas e Serviços",subcategory:"Armazenamento em nuvem",type:"Recorrente",confidence:0.99},
+
+  // Família, lazer e viagens
+  {pattern:"ANIMALIA",category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual",confidence:0.99},
+  {pattern:"HOTEL",category:"Lazer e Viagens",subcategory:"Hotéis / passagens",type:"Pontual",confidence:0.96},
+  {pattern:"POUSADA",category:"Lazer e Viagens",subcategory:"Hotéis / passagens",type:"Pontual",confidence:0.96},
+  {pattern:"AIRBNB",category:"Lazer e Viagens",subcategory:"Hotéis / passagens",type:"Pontual",confidence:0.99},
+  {pattern:"BOOKING",category:"Lazer e Viagens",subcategory:"Hotéis / passagens",type:"Pontual",confidence:0.99},
+  {pattern:"PARQUE",category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual",confidence:0.94},
+  {pattern:"ESCOLA",category:"Família e Filhos",subcategory:"Escola",type:"Obrigatório",confidence:0.95},
+  {pattern:"COLEGIO",category:"Família e Filhos",subcategory:"Escola",type:"Obrigatório",confidence:0.96},
+  {pattern:"BRINQUED",category:"Família e Filhos",subcategory:"Presentes",type:"Variável",confidence:0.82},
+
+  // Compras pessoais e bens
+  {pattern:"MERCADOLIVRE",category:"Compras Pessoais",subcategory:"Marketplace",type:"Variável",confidence:0.82},
+  {pattern:"MERCADO LIVRE",category:"Compras Pessoais",subcategory:"Marketplace",type:"Variável",confidence:0.82},
+  {pattern:"AMAZON",category:"Compras Pessoais",subcategory:"Marketplace",type:"Variável",confidence:0.78},
+  {pattern:"SHOP2GETHER",category:"Parcelados / Bens / Seguros",subcategory:"Vestuário parcelado",type:"Parcelado",confidence:0.98},
+  {pattern:"SESTINI",category:"Parcelados / Bens / Seguros",subcategory:"Outros parcelados",type:"Parcelado",confidence:0.92},
+  {pattern:"DELL",category:"Parcelados / Bens / Seguros",subcategory:"Eletrônicos",type:"Parcelado",confidence:0.99},
+  {pattern:"EDIFIER",category:"Parcelados / Bens / Seguros",subcategory:"Eletrônicos",type:"Parcelado",confidence:0.99},
+  {pattern:"MAGALU",category:"Compras Pessoais",subcategory:"Eletrônicos",type:"Variável",confidence:0.78},
+  {pattern:"RENNER",category:"Compras Pessoais",subcategory:"Vestuário",type:"Variável",confidence:0.94},
+  {pattern:"RIACHUELO",category:"Compras Pessoais",subcategory:"Vestuário",type:"Variável",confidence:0.94},
+
+  // Moradia
+  {pattern:"LEROY",category:"Moradia e Casa",subcategory:"Construção e decoração",type:"Variável",confidence:0.97},
+  {pattern:"TELHANORTE",category:"Moradia e Casa",subcategory:"Construção e decoração",type:"Variável",confidence:0.97},
+  {pattern:"TOKSTOK",category:"Moradia e Casa",subcategory:"Construção e decoração",type:"Variável",confidence:0.94},
+  {pattern:"CASA",category:"Moradia e Casa",subcategory:"Construção e decoração",type:"Variável",confidence:0.55},
+
+  // Educação
+  {pattern:"UDEMY",category:"Educação e Desenvolvimento",subcategory:"Cursos",type:"Variável",confidence:0.99},
+  {pattern:"CURSO",category:"Educação e Desenvolvimento",subcategory:"Cursos",type:"Variável",confidence:0.92},
+  {pattern:"LIVRARIA",category:"Educação e Desenvolvimento",subcategory:"Livros",type:"Variável",confidence:0.96},
+  {pattern:"CULTURA INGLESA",category:"Educação e Desenvolvimento",subcategory:"Idiomas",type:"Recorrente",confidence:0.99},
+
+  // Pets
+  {pattern:"PETZ",category:"Pets",subcategory:"Alimentação pet",type:"Variável",confidence:0.98},
+  {pattern:"PETLOVE",category:"Pets",subcategory:"Alimentação pet",type:"Variável",confidence:0.98},
+  {pattern:"VETERIN",category:"Pets",subcategory:"Veterinário",type:"Variável",confidence:0.96},
+  {pattern:"PET SHOP",category:"Pets",subcategory:"Alimentação pet",type:"Variável",confidence:0.94},
+
+  // Financeiro
+  {pattern:"YELUM",category:"Financeiro",subcategory:"Seguros",type:"Recorrente",confidence:0.99},
+  {pattern:"SEGURO",category:"Financeiro",subcategory:"Seguros",type:"Recorrente",confidence:0.90},
+  {pattern:"IOF",category:"Financeiro",subcategory:"IOF",type:"Obrigatório",confidence:0.99},
+  {pattern:"JUROS",category:"Financeiro",subcategory:"Juros",type:"Obrigatório",confidence:0.99},
+  {pattern:"ANUIDADE",category:"Financeiro",subcategory:"Anuidade",type:"Recorrente",confidence:0.99}
 ];
 
 const SEED=[
@@ -69,45 +152,51 @@ function migrateState(input){
   const data=input||defaultState();
   data.statements=(data.statements||[]).map(statement=>{
     statement.categories=statement.categories||{};
-    let pending=Number(statement.categories["Revisão necessária"]||0);
 
-    if(statement.categories["Outros / Não classificados"]!==undefined){
-      pending+=Number(statement.categories["Outros / Não classificados"]||0);
-      delete statement.categories["Outros / Não classificados"];
-    }
+    const legacyReview=Number(statement.categories["Revisão necessária"]||0);
+    const legacyOther=Number(statement.categories["Outros / Não classificados"]||0);
+    const legacyGrouped=Number(statement.categories["Compras / Educação / Diversos"]||0);
+    const migrated=legacyReview+legacyOther+legacyGrouped;
 
-    if(statement.categories["Compras / Educação / Diversos"]!==undefined){
-      pending+=Number(statement.categories["Compras / Educação / Diversos"]||0);
-      delete statement.categories["Compras / Educação / Diversos"];
-      const note="Valor da antiga categoria agrupada Compras/Educação/Diversos transferido para Revisão necessária após atualização da árvore.";
+    delete statement.categories["Revisão necessária"];
+    delete statement.categories["Outros / Não classificados"];
+    delete statement.categories["Compras / Educação / Diversos"];
+
+    if(migrated>0){
+      statement.categories["Compras Pessoais"]=Number(statement.categories["Compras Pessoais"]||0)+migrated;
+      const note="Valores antigos sem abertura por transação foram classificados provisoriamente em Compras Pessoais. Reanexe o PDF para maior precisão.";
       if(!(statement.context||"").includes(note)) statement.context=(statement.context?statement.context+" ":"")+note;
     }
 
-    if(pending>0) statement.categories["Revisão necessária"]=pending;
-
     statement.transactions=(statement.transactions||[]).map(t=>{
-      if(t.category==="Outros / Não classificados" || t.category==="Compras / Educação / Diversos"){
-        t.category="Revisão necessária";
-        t.subcategory="Categoria pendente";
+      if(["Revisão necessária","Outros / Não classificados","Compras / Educação / Diversos"].includes(t.category)){
+        const suggestion=classify(t.merchant||"");
+        t.category=suggestion.category;
+        t.subcategory=suggestion.subcategory;
+        t.type=t.type||suggestion.type;
+        t.confidence=suggestion.confidence;
+        t.needsReview=suggestion.needsReview;
       }
       return t;
     });
     return statement;
   });
 
-  data.rules=(data.rules||DEFAULT_RULES).map(rule=>{
-    if(rule.category==="Outros / Não classificados" || rule.category==="Compras / Educação / Diversos"){
-      return {...rule,category:"Revisão necessária",subcategory:"Categoria pendente"};
+  const learned=(data.rules||[]).filter(rule=>rule && rule.pattern);
+  const merged=[...learned];
+  DEFAULT_RULES.forEach(rule=>{
+    if(!merged.some(existing=>normalizeMerchant(existing.pattern)===normalizeMerchant(rule.pattern))){
+      merged.push(rule);
     }
-    return rule;
   });
-  data.version=3;
+  data.rules=merged;
+  data.version=4;
   return data;
 }
 
 function defaultState(){
   return {
-    version:1,statements:SEED,rules:DEFAULT_RULES,
+    version:4,statements:SEED,rules:DEFAULT_RULES,
     goals:{foodMin:3000,foodMax:3500,vehiclesMin:1200,vehiclesMax:1500,
       semPararMin:800,semPararMax:900,subscriptionsMax:800,
       healthMin:700,healthMax:1000,diverseMin:1000,diverseMax:1500,
@@ -170,7 +259,10 @@ function renderDashboard(){
     ["Mediana",money(median(adjusted)),"Reduz efeito de outliers",""],
     ["Desvio padrão",money(std(adjusted)),"Volatilidade do histórico",std(adjusted)>2000?"warn":""],
     ["Pontuais excluídos",money(last.pointInTime||0),"Mantidos no caixa bruto",""],
-    ["Revisão pendente",money(last.categories["Revisão necessária"]||0),"Valor ainda não classificado",(last.categories["Revisão necessária"]||0)>0?"warn":"good"],
+    ["Sugestões a confirmar",
+      `${(last.transactions||[]).filter(t=>t.needsReview).length}`,
+      "Itens classificados com baixa confiança",
+      (last.transactions||[]).some(t=>t.needsReview)?"warn":"good"],
     ["Próxima fatura",money(last.nextCommitment),"Compromisso já contratado","warn"],
     ["Parcelado futuro",money(last.futureTotal),"Saldo para meses seguintes",""],
     ["Grau de risco",risk,"Com base na fatura ajustada",riskClass],
@@ -298,15 +390,52 @@ function renderRules(){
 window.removeRule=function(i){state.rules.splice(i,1);saveState();renderRules()}
 
 function normalize(s){return String(s||"").replace(/\s+/g," ").trim()}
+function normalizeMerchant(s){
+  return normalize(s).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^A-Z0-9+ ]/g," ").replace(/\s+/g," ").trim();
+}
 function parseBR(s){return Number(String(s||"").replace(/\s/g,"").replace(/\./g,"").replace(",",".").replace(/[^\d.-]/g,""))||0}
 function findMoney(text,re){const m=text.match(re);return m?parseBR(m[1]):0}
 function classify(merchant){
-  const n=normalize(merchant).toUpperCase();
-  const rule=state.rules.find(r=>n.includes(r.pattern));
-  if(rule)return {category:rule.category,subcategory:rule.subcategory,type:rule.type};
-  if(/DELL|EDIFIER|YELUM|SEGURO/.test(n))return {category:"Parcelados / Bens / Seguros",subcategory:"Outros parcelados",type:"Parcelado"};
-  if(/HOTEL|PARQUE|EVENTO|FEST/.test(n))return {category:"Lazer e Viagens",subcategory:"Parques / eventos",type:"Pontual"};
-  return {category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável"};
+  const n=normalizeMerchant(merchant);
+  const sorted=[...(state?.rules||DEFAULT_RULES)].sort((a,b)=>normalizeMerchant(b.pattern).length-normalizeMerchant(a.pattern).length);
+  const rule=sorted.find(r=>n.includes(normalizeMerchant(r.pattern)));
+  if(rule){
+    const confidence=Number(rule.confidence||0.90);
+    return {
+      category:rule.category,subcategory:rule.subcategory,type:rule.type,
+      confidence,needsReview:confidence<0.70,source:"regra"
+    };
+  }
+
+  // Heurísticas amplas: sempre sugerem uma categoria real.
+  if(/PANIFIC|CONFEIT|BOLOS|DOCES|SORVET/.test(n))
+    return {category:"Alimentação",subcategory:"Padaria e café",type:"Variável",confidence:0.78,needsReview:false,source:"heurística"};
+  if(/BAR |BAR$|BOTECO|CHOPERIA|LANCHONETE|BURGER|STEAK|CANTINA/.test(n))
+    return {category:"Alimentação",subcategory:"Restaurantes",type:"Variável",confidence:0.76,needsReview:false,source:"heurística"};
+  if(/MERCADINHO|EMPORIO|MERCEARIA|CONVENIENCIA/.test(n))
+    return {category:"Alimentação",subcategory:"Conveniência",type:"Variável",confidence:0.72,needsReview:false,source:"heurística"};
+  if(/COMBUST|GASOLINA|ETANOL/.test(n))
+    return {category:"Veículos e Transporte",subcategory:"Combustível",type:"Recorrente",confidence:0.84,needsReview:false,source:"heurística"};
+  if(/OFICINA|AUTOMOTIV|PNEU|AUTO PECAS|BORRACHARIA/.test(n))
+    return {category:"Veículos e Transporte",subcategory:"Manutenção",type:"Variável",confidence:0.83,needsReview:false,source:"heurística"};
+  if(/MEDIC|HOSPITAL|ODONTO|DENTAL|PSICO|FISIO/.test(n))
+    return {category:"Saúde",subcategory:"Consultas",type:"Variável",confidence:0.76,needsReview:false,source:"heurística"};
+  if(/ACADEMIA|GYM|FITNESS/.test(n))
+    return {category:"Saúde",subcategory:"Consultas",type:"Recorrente",confidence:0.66,needsReview:true,source:"heurística"};
+  if(/LIVRO|PAPELARIA|IDIOMAS|INGLES|ENGLISH/.test(n))
+    return {category:"Educação e Desenvolvimento",subcategory:"Material de estudo",type:"Variável",confidence:0.72,needsReview:false,source:"heurística"};
+  if(/VET|PET|RACAO/.test(n))
+    return {category:"Pets",subcategory:"Alimentação pet",type:"Variável",confidence:0.76,needsReview:false,source:"heurística"};
+  if(/MOVEIS|DECOR|MATERIAL DE CONSTRUCAO|FERRAGEM|ELETRICA|HIDRAULICA/.test(n))
+    return {category:"Moradia e Casa",subcategory:"Construção e decoração",type:"Variável",confidence:0.78,needsReview:false,source:"heurística"};
+  if(/CIA AEREA|LATAM|AZUL|GOL LINHAS|PASSAGEM|TURISMO|VIAGEM/.test(n))
+    return {category:"Lazer e Viagens",subcategory:"Hotéis / passagens",type:"Pontual",confidence:0.84,needsReview:false,source:"heurística"};
+  if(/ROUPAS|MODA|CALCADOS|SAPAT|TENIS|COSMET|PERFUM/.test(n))
+    return {category:"Compras Pessoais",subcategory:"Vestuário",type:"Variável",confidence:0.74,needsReview:false,source:"heurística"};
+
+  // Em vez de categoria genérica, usa Compras Pessoais como melhor estimativa.
+  return {category:"Compras Pessoais",subcategory:"Outras compras",type:"Variável",confidence:0.45,needsReview:true,source:"estimativa"};
 }
 function parseStatementText(text,fileName){
   const dueMatch=text.match(/Vencimento:\s*(\d{2}\/\d{2}\/\d{4})/i)||text.match(/Com vencimento em:\s*(\d{2}\/\d{2}\/\d{4})/i);
@@ -321,7 +450,7 @@ function parseStatementText(text,fileName){
     const merchant=normalize(m[2]);if(ignored.test(merchant))continue;
     const amount=parseBR(m[3]);if(!amount||Math.abs(amount)>100000)continue;
     const c=classify(merchant);
-    tx.push({id:crypto.randomUUID(),date:m[1],merchant,amount,category:c.category,subcategory:c.subcategory,type:c.type,excluded:false});
+    tx.push({id:crypto.randomUUID(),date:m[1],merchant,amount,category:c.category,subcategory:c.subcategory,type:c.type,confidence:c.confidence,needsReview:c.needsReview,autoCategory:c.category,autoSubcategory:c.subcategory,excluded:false});
   }
   const unique=[],seen=new Set();tx.forEach(t=>{const k=`${t.date}|${t.merchant}|${t.amount}`;if(!seen.has(k)){seen.add(k);unique.push(t)}});
   return {id:month,month,dueDate,total,adjustedTotal:total,nextCommitment:next,futureTotal:future,context:"",transactions:unique,fileName};
@@ -371,16 +500,16 @@ function fillReview(){
 }
 function catOptions(sel){return CATEGORIES.map(c=>`<option ${c===sel?"selected":""}>${c}</option>`).join("")}
 function renderReview(){
-  const pending=(currentReview.transactions||[]).filter(t=>t.category==="Revisão necessária");
+  const pending=(currentReview.transactions||[]).filter(t=>t.needsReview);
   const pendingValue=pending.reduce((sum,t)=>sum+Number(t.amount||0),0);
   const alert=document.querySelector("#review-alert");
   alert.innerHTML=pending.length
-    ? `<div class="notice warning"><strong>Revisão pendente:</strong> ${pending.length} lançamento(s), total de ${money(pendingValue)}. Reclassifique antes de consolidar ou confirme explicitamente a manutenção como pendente.</div>`
-    : `<div class="notice"><strong>Classificação revisada:</strong> não há lançamentos pendentes.</div>`;
+    ? `<div class="notice warning"><strong>Classificações sugeridas com baixa confiança:</strong> ${pending.length} lançamento(s), total de ${money(pendingValue)}. Eles já estão dentro de categorias reais; revise somente se desejar.</div>`
+    : `<div class="notice"><strong>Classificação automática concluída:</strong> todos os lançamentos receberam categoria com boa confiança.</div>`;
   document.querySelector("#review-transactions").innerHTML=(currentReview.transactions||[]).map((t,i)=>`
     <tr>
       <td><input class="tx-date" value="${t.date||""}"></td>
-      <td><input class="tx-merchant" value="${esc(t.merchant||"")}"></td>
+      <td><input class="tx-merchant" value="${esc(t.merchant||"")}"><div class="muted">${t.needsReview?"Sugestão — confirmar se necessário":"Classificação automática"}</div></td>
       <td><input class="tx-amount" type="number" step="0.01" value="${Number(t.amount||0).toFixed(2)}"></td>
       <td><select class="tx-category">${catOptions(t.category)}</select></td>
       <td><select class="tx-type">${["Recorrente","Variável","Pontual","Parcelado","Obrigatório","Semi-obrigatório","Extraordinário"].map(x=>`<option ${x===t.type?"selected":""}>${x}</option>`).join("")}</select></td>
@@ -394,18 +523,25 @@ function syncReview(){
     t.date=row.querySelector(".tx-date").value;t.merchant=row.querySelector(".tx-merchant").value;
     t.amount=Number(row.querySelector(".tx-amount").value||0);t.category=row.querySelector(".tx-category").value;
     t.type=row.querySelector(".tx-type").value;t.excluded=row.querySelector(".tx-excluded").checked;
-    if(!t.subcategory)t.subcategory=classify(t.merchant).subcategory;
+    const suggested=classify(t.merchant);
+    if(!t.subcategory || t.category!==t.autoCategory){
+      t.subcategory=t.category===suggested.category?suggested.subcategory:(TREE[t.category]?.[0]||"Outras compras");
+    }
+    if(t.category!==t.autoCategory) t.needsReview=false;
   })
 }
 window.removeReviewTx=function(i){syncReview();currentReview.transactions.splice(i,1);renderReview()}
-document.querySelector("#add-transaction").onclick=()=>{syncReview();currentReview.transactions.push({id:crypto.randomUUID(),date:"",merchant:"Novo lançamento",amount:0,category:"Revisão necessária",subcategory:"Categoria pendente",type:"Variável",excluded:false});renderReview()}
+document.querySelector("#add-transaction").onclick=()=>{syncReview();currentReview.transactions.push({id:crypto.randomUUID(),date:"",merchant:"Novo lançamento",amount:0,category:"Compras Pessoais",subcategory:"Outras compras",type:"Variável",confidence:0.40,needsReview:true,autoCategory:"Compras Pessoais",excluded:false});renderReview()}
 document.querySelector("#cancel-review").onclick=()=>{currentReview=null;document.querySelector("#statement-form").classList.add("hidden");document.querySelector("#pdf-input").value="";document.querySelector("#upload-status").textContent=""}
 
 document.querySelector("#statement-form").onsubmit=e=>{
   e.preventDefault();syncReview();
-  const pending=currentReview.transactions.filter(t=>t.category==="Revisão necessária");
-  const pendingValue=pending.reduce((sum,t)=>sum+Number(t.amount||0),0);
-  if(pending.length && !confirm(`Existem ${pending.length} lançamento(s) em Revisão necessária, totalizando ${money(pendingValue)}. Deseja consolidar mesmo assim?`)) return;
+  const lowConfidence=currentReview.transactions.filter(t=>t.needsReview);
+  if(lowConfidence.length){
+    const lowValue=lowConfidence.reduce((sum,t)=>sum+Number(t.amount||0),0);
+    if(!confirm(`O app fez a melhor classificação possível, mas ${lowConfidence.length} lançamento(s), total de ${money(lowValue)}, têm baixa confiança. Deseja consolidar com essas sugestões?`)) return;
+  }
+  learnFromCorrections(currentReview.transactions);
   const month=document.querySelector("#statement-month").value;if(!month)return alert("Informe o mês.");
   const categories={};let pointInTime=0;
   currentReview.transactions.forEach(t=>{if(t.excluded)pointInTime+=Number(t.amount||0);else categories[t.category]=(categories[t.category]||0)+Number(t.amount||0)});
@@ -416,7 +552,7 @@ document.querySelector("#statement-form").onsubmit=e=>{
     nextCommitment:Number(document.querySelector("#next-commitment").value||0),
     futureTotal:Number(document.querySelector("#future-total").value||0),pointInTime,
     context:document.querySelector("#month-context").value,
-    categories:Object.keys(categories).length?categories:{"Revisão necessária":total-pointInTime},
+    categories:Object.keys(categories).length?categories:{"Compras Pessoais":total-pointInTime},
     vehicleBreakdown:buildVehicle(currentReview.transactions),transactions:currentReview.transactions,
     fileId:currentReview.fileId,isEstimate:false
   };
@@ -426,6 +562,25 @@ document.querySelector("#statement-form").onsubmit=e=>{
   document.querySelector("#pdf-input").value="";document.querySelector("#upload-status").textContent="Fatura consolidada com sucesso.";
   renderAll();go("statements");
 }
+function learnFromCorrections(transactions){
+  transactions.forEach(t=>{
+    const merchant=normalizeMerchant(t.merchant);
+    if(!merchant || merchant==="NOVO LANCAMENTO") return;
+    const automatic=classify(t.merchant);
+    const changed=t.category!==automatic.category || (t.subcategory && t.subcategory!==automatic.subcategory);
+    if(changed){
+      const existing=state.rules.find(r=>normalizeMerchant(r.pattern)===merchant);
+      const learned={
+        pattern:merchant,category:t.category,
+        subcategory:t.subcategory||(TREE[t.category]?.[0]||"Outras compras"),
+        type:t.type,confidence:0.99,userLearned:true
+      };
+      if(existing) Object.assign(existing,learned);
+      else state.rules.unshift(learned);
+    }
+  });
+}
+
 function buildVehicle(tx){
   const out={"Pedágio / Sem Parar":0,"Combustível":0,"Manutenção":0,"Estacionamento":0};
   tx.filter(t=>t.category==="Veículos e Transporte"&&!t.excluded).forEach(t=>{const sub=t.subcategory||classify(t.merchant).subcategory;if(out[sub]!==undefined)out[sub]+=Number(t.amount||0)});
@@ -460,7 +615,7 @@ document.querySelector("#export-backup").onclick=()=>{
 }
 document.querySelector("#import-backup").onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
-  try{const data=JSON.parse(await f.text());if(!data.statements||!data.rules)throw new Error("Backup inválido.");state=migrateState(data);saveState();renderAll();alert("Backup restaurado e atualizado para a nova árvore de gastos.")}catch(err){alert(err.message)}
+  try{const data=JSON.parse(await f.text());if(!data.statements||!data.rules)throw new Error("Backup inválido.");state=migrateState(data);saveState();renderAll();alert("Backup restaurado. A classificação automática e as regras aprendidas foram atualizadas.")}catch(err){alert(err.message)}
   e.target.value="";
 }
 document.querySelector("#clear-data").onclick=async()=>{
